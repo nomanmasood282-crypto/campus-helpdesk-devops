@@ -44,11 +44,41 @@ jobs:
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: campus-helpdesk-api:${{ github.sha }}
-          format: table
-          exit-code: "1"
+          format: json
+          output: trivy-results.json
+          exit-code: "0"
           ignore-unfixed: true
           severity: HIGH,CRITICAL
           cache: false
+
+      - name: Enforce vulnerability policy
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+
+          with open("trivy-results.json", encoding="utf-8") as report_file:
+              report = json.load(report_file)
+
+          findings = []
+          for result in report.get("Results", []):
+              for vulnerability in result.get("Vulnerabilities", []):
+                  if vulnerability.get("Severity") in {"HIGH", "CRITICAL"}:
+                      findings.append((result.get("Target", "unknown"), vulnerability))
+
+          for target, vulnerability in findings:
+              print(
+                  f"{vulnerability['Severity']} {vulnerability['VulnerabilityID']} "
+                  f"package={vulnerability['PkgName']} "
+                  f"version={vulnerability['InstalledVersion']} "
+                  f"fixed={vulnerability.get('FixedVersion', 'unknown')} "
+                  f"target={target}"
+              )
+
+          if findings:
+              sys.exit(f"Trivy found {len(findings)} HIGH/CRITICAL vulnerabilities.")
+          PY
 
       - name: Log in to GitHub Container Registry
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
