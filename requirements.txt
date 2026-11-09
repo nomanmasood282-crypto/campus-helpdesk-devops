@@ -3,6 +3,3 @@ uvicorn[standard]
 prometheus-client
 pytest
 httpx
-msgpack>=1.2.3
-setuptools>=78.1.1
-urllib3>=2.8.0
