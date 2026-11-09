@@ -51,6 +51,7 @@ jobs:
           exit-code: "0"
           ignore-unfixed: true
           severity: HIGH,CRITICAL
+          skip-files: usr/local/lib/python3.14/site-packages/pip/_vendor/bom.cdx.json
           list-all-pkgs: true
           cache: false
 
