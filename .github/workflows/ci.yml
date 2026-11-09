@@ -48,6 +48,7 @@ jobs:
           exit-code: "1"
           ignore-unfixed: true
           severity: HIGH,CRITICAL
+          cache: false
 
       - name: Log in to GitHub Container Registry
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
