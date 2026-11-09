@@ -1,9 +1,9 @@
 replicaCount: 1
 
 image:
-  repository: campus-helpdesk-api
+  repository: ghcr.io/nomanmasood282-crypto/campus-helpdesk-devops
   pullPolicy: IfNotPresent
-  tag: "0.1.0"
+  tag: "137d5692850089614568be401dc9eda3c69bd2c3"
 
 service:
   type: ClusterIP
