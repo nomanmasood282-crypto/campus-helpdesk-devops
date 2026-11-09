@@ -49,6 +49,7 @@ jobs:
           exit-code: "0"
           ignore-unfixed: true
           severity: HIGH,CRITICAL
+          list-all-pkgs: true
           cache: false
 
       - name: Enforce vulnerability policy
@@ -63,6 +64,13 @@ jobs:
 
           findings = []
           for result in report.get("Results", []):
+              print(
+                  f"SCAN_TARGET class={result.get('Class')} "
+                  f"type={result.get('Type')} target={result.get('Target')}"
+              )
+              for package in result.get("Packages", []):
+                  if package.get("Name", "").lower() in {"msgpack", "setuptools", "urllib3"}:
+                      print(f"PACKAGE {json.dumps(package, sort_keys=True)}")
               for vulnerability in result.get("Vulnerabilities", []):
                   if vulnerability.get("Severity") in {"HIGH", "CRITICAL"}:
                       findings.append((result.get("Target", "unknown"), vulnerability))
@@ -75,6 +83,7 @@ jobs:
                   f"fixed={vulnerability.get('FixedVersion', 'unknown')} "
                   f"target={target}"
               )
+              print(f"DETAILS {json.dumps(vulnerability, sort_keys=True)}")
 
           if findings:
               sys.exit(f"Trivy found {len(findings)} HIGH/CRITICAL vulnerabilities.")
